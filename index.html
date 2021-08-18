@@ -211,11 +211,10 @@ function get_table (data) {
           {
             v.push(dic_table[d][m]);
           }
-        else
-          {
-            z=1
+          //else
+          //{
             //v.push('NA');
-          };
+          //};
         })
     sums = sum_array(v.slice(1,v.length))
     v.push(sums[0])
@@ -235,9 +234,9 @@ function draw_table(data,new_data) {
     v_mean = get_stat_month (data)
     v_mean['mean'].push(parseInt(d3.mean(sd)))
     v_mean['stdev'].push(parseInt(d3.deviation(sd)))
-    stat_data.push(v_mean['mean']) 
+    stat_data.unshift(v_mean['mean'])
     new_data = get_table (new_data)
-    stat_data.push(new_data[0])
+    //stat_data.push(new_data[0])
     pvals=['p-value']
     const f = d3.format(".1e");
     if ( new_data[0] == undefined ) {
@@ -253,7 +252,8 @@ function draw_table(data,new_data) {
       p=1-jStat.normal.cdf(new_data[0][i],v_mean['mean'][i],v_mean['stdev'][i])
       pvals.push(f(p))
     }
-    stat_data.push(pvals)
+    stat_data.unshift(pvals)
+    stat_data.unshift(new_data[0])
     //console.log(pvals)
       columns = ['Data'];
       d_columns = [{'title':'Data'}]
