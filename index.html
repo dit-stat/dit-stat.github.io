@@ -235,9 +235,9 @@ function draw_table(data,new_data) {
     v_mean = get_stat_month (data)
     v_mean['mean'].push(parseInt(d3.mean(sd)))
     v_mean['stdev'].push(parseInt(d3.deviation(sd)))
+    stat_data.push(v_mean['mean']) 
     new_data = get_table (new_data)
     stat_data.push(new_data[0])
-    stat_data.push(v_mean['mean'])
     pvals=['p-value']
     const f = d3.format(".1e");
     if ( new_data[0] == undefined ) {
@@ -276,13 +276,23 @@ function draw_table(data,new_data) {
         data: stat_data,
         columns: d_columns,
         pageLength: 20,
+        order: [],
         "rowCallback": function( row, data, index ) {
         if ( data[0] == "p-value") {
           //Highlight the cell value
+          $(row).find('td:eq("0")').css('font-weight', 'bold')
           for (let i=1; i < data.length; i++ ) {
           if (data[i] < 0.05 ) {
-            $(row).find('td:eq("'+i+'")').css('color', 'red');
+            $(row).find('td:eq("'+i+'")').css('font-weight', 'bold');
           }
+        }
+          //Highlight the row
+          $(row).addClass("danger");
+        }
+        if ( data[0] == "2020" || data[0] == "2021") {
+          //Highlight the cell value
+          for (let i=0; i < data.length; i++ ) {
+            $(row).find('td:eq("'+i+'")').css('color', 'red');
         }
           //Highlight the row
           $(row).addClass("danger");
