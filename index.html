@@ -1,0 +1,572 @@
+<!-- Code from d3-graph-gallery.com -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- __insert_page_type__ -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="Death in Italy">
+    <meta name="author" content="">
+    <link rel="icon" href="/favicon.ico">
+
+    <title>DIt - Death in Italy</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="./js/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="./js/jumbotron-narrow-dit.css" rel="stylesheet">
+
+    <!-- Load DataTables and d3-->
+
+  </head>
+
+  <body >
+
+    <br>
+    <div class="container">
+
+      <div class="jumbotron">
+	<table width="100%">
+	<tr>
+	<td>
+	<div class="left_cell">
+
+
+	</div>
+	</td>
+	<td>
+
+	</td>
+	</tr>
+	</table>
+	<br>
+        <h1 style="color:#000000;">DIt</h1>
+        <p ><b>D</b>eath in <b>It</b>aly
+        <br>Statistics of the number of deaths in italian.</p>
+	<br><br><br>
+	<div class="text">
+	<br>
+          <p class="text" ><!-- __output_content__ -->
+	</div>
+
+<!-- Load d3.js -->
+<script src="./js/d3.v4.js"></script>
+<script src="./js/jquery-3.5.1.js" charset="utf-8"></script>
+<script src="./js/jquery.dataTables.min.js" charset="utf-8"></script>
+<script src="./js/jstat.min.js" charset="utf-8"></script>
+<link rel="stylesheet" type="text/css" href="./js/datatables.min.css" />
+
+
+
+<!-- Create a div where the graph will take place -->
+
+<br><br>
+<center>
+<b>Year</b>:
+ <select name="year" id="year" xonchange="get_year(this)">
+      <option value="2020">Jan-Dec 2020</option>
+	    <option value="2021">Jan-May 2021</option>
+</select>
+&nbsp;&nbsp;&nbsp;
+<b>Region</b>: <select name="region" id="region" xonchange="get_region(this)">
+	<option value="Italy">Italia</option>
+	<option value="Abruzzo">Abruzzo</option>
+	<option value="Basilicata">Basilicata</option>
+	<option value="Calabria">Calabria</option>
+	<option value="Campania">Campania</option>
+	<option value="Emilia-Romagna">Emilia-Romagna</option>
+	<option value="Friuli-Venezia-Giulia">Friuli Venezia Giulia</option>
+	<option value="Lazio">Lazio</option>
+	<option value="Liguria">Liguria</option>
+	<option value="Lombardia">Lombardia</option>
+	<option value="Marche">Marche</option>
+	<option value="Molise">Molise</option>
+	<option value="Piemonte">Piemonte</option>
+	<option value="Puglia">Puglia</option>
+	<option value="Sardegna">Sardegna</option>
+	<option value="Sicilia">Sicilia</option>
+	<option value="Toscana">Toscana</option>
+	<option value="Trentino-Alto-Adige">Trentino Alto Adige</option>
+	<option value="Umbria">Umbria</option>
+	<option value="Valle-d'Aosta">Valle d'Aosta</option>
+	<option value="Veneto">Veneto</option>
+  </select>
+&nbsp;&nbsp;&nbsp;
+
+
+<b>Operator</b>: <select name="operator" id="operator" xonchange="get_operator(this)">
+        <option value="gt">&nbsp;&gt;&nbsp;</option>
+        <option value="le">&nbsp;&le;&nbsp;</option>
+      </select>
+&nbsp;&nbsp;&nbsp;
+<b>Age</b>: <select name="age" id="age" xonchange="get_age(this)">
+
+  <option value=0>0</option>
+	<option value=5>5</option>
+	<option value=10>10</option>
+	<option value=15>15</option>
+	<option value=20>20</option>
+	<option value=25>25</option>
+	<option value=30>30</option>
+	<option value=35>35</option>
+	<option value=40>40</option>
+	<option value=45>45</option>
+	<option value=50>50</option>
+	<option value=55>55</option>
+	<option value=60>60</option>
+	<option value=65>65</option>
+	<option value=70>70</option>
+	<option value=75>75</option>
+	<option value=80>80</option>
+	<option value=85>85</option>
+	<option value=90>90</option>
+	<option value=95>95</option>
+	<option value=100>100</option>
+	<option value=105>105</option>
+  <option value=110>110</option>
+
+      </select>
+
+
+<br><br>
+<div id="dit_plot"></div>
+
+<br><br>
+<br><br>
+
+<table id="dit_table" class="display nowrap" style="width:100%;font-family: Verdana, Geneva, Tahoma, sans-serif;">
+
+</table>
+
+<script>
+
+
+function hideLoader() {
+$('#loading').hide();
+}
+
+
+function get_stat_month (data) {
+  months = list_months
+  mean_table={}
+  v_mean=['Average']
+  v_stdev=['StDev']
+  data.forEach(function(d) {
+      if ( !(mean_table.hasOwnProperty(d.Month)) ) {mean_table[d.Month]=[]}
+      mean_table[d.Month].push(d.Deaths)
+      })
+  months.forEach(function (m) {
+    if (mean_table.hasOwnProperty(m))
+      { if (mean_table[m].length>0) {
+        //sums = sum_array(mean_table[m])
+        sums=d3.mean(mean_table[m])
+        stdev=d3.deviation(mean_table[m])
+        v_mean.push(parseInt(sums))
+        v_stdev.push(parseInt(stdev))
+        }
+        else {
+          v_mean.push('NA')
+        }
+      }
+      else {
+        v_mean.push('NA')
+      }
+  })
+  return {'mean':v_mean,'stdev':v_stdev}
+  }
+
+
+function sum_array(v) {
+  var c = 0
+  var sum = 0.0
+  for (let i = 0; i < v.length; i++) {
+    if (v[i] != "NA") {sum=sum+parseInt(v[i]); c=c+1}
+  }
+  return [sum,c]
+}
+
+
+function get_table (data) {
+  months = list_months
+  dic_table={}
+  d_table=[]
+  data.forEach(function(d) {
+      if ( !(dic_table.hasOwnProperty(d.Year)) ) {dic_table[d.Year]={}}
+      dic_table[d.Year][d.Month]=d.Deaths
+      })
+  var years=Object.keys(dic_table)
+  years.reverse().forEach(function (d)
+  {
+    var v=[d];
+    months.forEach(function (m) {
+        if ( dic_table[d].hasOwnProperty(m) )
+          {
+            v.push(dic_table[d][m]);
+          }
+        else
+          {
+            z=1
+            //v.push('NA');
+          };
+        })
+    sums = sum_array(v.slice(1,v.length))
+    v.push(sums[0])
+    d_table.push(v)
+  })
+  return d_table
+ }
+
+
+function draw_table(data,new_data) {
+    stat_data = get_table (data)
+    var sd = []
+    for (let i = 0; i < stat_data.length; i++) {
+      sd.push(stat_data[i][stat_data[i].length-1])
+    }
+
+    v_mean = get_stat_month (data)
+    v_mean['mean'].push(parseInt(d3.mean(sd)))
+    v_mean['stdev'].push(parseInt(d3.deviation(sd)))
+    new_data = get_table (new_data)
+    stat_data.push(new_data[0])
+    stat_data.push(v_mean['mean'])
+    pvals=['p-value']
+    const f = d3.format(".1e");
+    if ( new_data[0] == undefined ) {
+      $('#dit_table').dataTable().fnClearTable();
+      $('#dit_table').dataTable().fnDestroy();
+      $('#dit_table').empty();
+      //d3.select("svg").remove();
+      return;
+    }
+
+    for (let i = 1; i < new_data[0].length; i++) {
+      //p=parseFloat(1-jStat.studentt.cdf((new_data[0][i]-v_mean['mean'][i])/v_mean['stdev'][i],8))
+      p=1-jStat.normal.cdf(new_data[0][i],v_mean['mean'][i],v_mean['stdev'][i])
+      pvals.push(f(p))
+    }
+    stat_data.push(pvals)
+    //console.log(pvals)
+      columns = ['Data'];
+      d_columns = [{'title':'Data'}]
+      for (let i = 0; i < list_months.length; i++) {
+        columns.push(list_months[i])
+        d_columns.push({'title': list_months[i]})
+      }
+      columns.push('Total')
+      d_columns.push({'title':'Total'})
+      //['Data',"Jan", "Feb", "Mar", "Apr", "May",
+      //               "Jun","Jul","Aug","Sep","Oct","Nov","Dec","Total"]
+    // Initialize table and destroy the old one if exists
+    if ($.fn.DataTable.isDataTable('#dit_table')) {
+        $('#dit_table').dataTable().fnClearTable();
+        $('#dit_table').dataTable().fnDestroy();
+        $('#dit_table').empty();
+        //d3.select("svg").remove();
+    }
+    var table = $('#dit_table').DataTable({
+        data: stat_data,
+        columns: d_columns,
+        pageLength: 20,
+        "rowCallback": function( row, data, index ) {
+        if ( data[0] == "p-value") {
+          //Highlight the cell value
+          for (let i=1; i < data.length; i++ ) {
+          if (data[i] < 0.05 ) {
+            $(row).find('td:eq("'+i+'")').css('color', 'red');
+          }
+        }
+          //Highlight the row
+          $(row).addClass("danger");
+        }
+}
+    });
+
+    hideLoader();
+}
+
+
+function plot(region,year,operator,age) {
+// set the dimensions and margins of the graph
+var margin = {top: 30, right: 100, bottom: 30, left: 100},
+    width = 980 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
+
+
+// append the svg object to the body of the page
+d3.select("svg").remove();
+var svg = d3.select("#dit_plot")
+  .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+svg
+  .append("rect")
+    .attr("x",0)
+    .attr("y",0)
+    .attr("height", height)
+    .attr("width", width)
+    .style("fill", "rgb(244,244,244)")
+    .style("stroke", "black")
+
+
+// Read the data and compute summary statistics for each specie
+d3.csv("./20210531-istat.csv", function(data) {
+
+  // Compute quartiles, median, inter quantile range min and max --> these info are then used to draw the box.
+    function select_data (data,i_region,i_year,i_operator,i_age) {
+      f_data = []
+      data.forEach(function(d) {
+      Region = d.Region;
+      Month = d.Month;
+      Year = parseInt(d.Year);
+      Age = parseInt(d.Age);
+      if ( Region != i_region ) {return;}
+      if (i_operator == "gt" && Age <= i_age ) {return;}
+      if (i_operator == "le" && Age > i_age ) {return;}
+      if  ( ! ( f_data.hasOwnProperty([Region,Month,Year] ) ) )
+      {
+	 f_data [[Region,Month,Year]]=0
+      }
+      f_data [[Region,Month,Year]] = f_data [[Region,Month,Year]]  +parseInt(d.Deaths)
+      //console.log([Region,Month,Year],lvs[[Region,Month,Year]])
+      });
+
+     // console.log(f_data)
+     o_data=[]
+     Object.keys(f_data).forEach(function(k,i) {
+     d=k.split(",")
+     var v = f_data[d]
+     //console.log(d,v)
+     o_data.push({'Region':d[0],'Month':d[1],'Year':d[2],'Deaths':v})
+     });
+     //console.log('init',o_data)
+     return o_data;
+     }
+
+     var r = region;
+     var y = year;
+     var o = operator;
+     var a = age;
+     //if (o == "le" && a == 0) {a=5; age=5}
+     //if (o == "gt" && a == 110) {a=105; age =105}
+     var sel_data = select_data(data,region,year,operator,age)
+
+     var y = year;
+     new_data = sel_data.filter(function(row) {
+           return row['Region'] == r && row['Month']!="Year" && row['Year']==y;
+       });
+
+     const listOfNames= []
+     for (const row of new_data) {
+             listOfNames.push(row.Month)
+     }
+
+     list_months = d3.set(listOfNames).values()
+
+
+  var r = region;
+  old_data = sel_data.filter(function(row) {
+	//console.log(row);
+        return row['Region'] == r && list_months.indexOf(row['Month'])>-1 && row['Year']!="2020" && row['Year']!="2021";
+  });
+
+  old_data.sort(function(d){
+   return d3.ascending(d.Year);
+  })
+  //console.log(old_data)
+
+  var sumstat = d3.nest() // nest function allows to group the calculation per level of a factor
+    .key(function(d) { return d.Month;})
+    .rollup(function(d) {
+      vals=d.map(function(g) { return +g.Deaths;});
+      vals.sort(function (a,b) {return parseInt(a) - parseInt(b);});
+      //console.log('1',vals)
+      q1 = d3.quantile(vals,.25)
+      median = d3.quantile(vals,.5)
+      q3 = d3.quantile(vals,.75)
+      interQuantileRange = q3 - q1
+      min = Math.max(q1 - 1.5 * interQuantileRange,0)
+      max = q3 + 1.5 * interQuantileRange
+      //console.log(q1,q3,median);
+      return({q1: q1, median: median, q3: q3, interQuantileRange: interQuantileRange, min: min, max: max})
+    })
+    .entries(old_data)
+
+  //console.log(sumstat)
+  var ymax=0
+  var ymin=1000000
+  old_data.forEach(function(d){
+	ymax=Math.max(ymax,d.Deaths)
+	ymin=Math.min(ymin,d.Deaths)
+  })
+  sumstat.forEach(function(d){
+  ymax=Math.max(ymax,d["value"]['max'])
+  ymin=Math.min(ymin,d["value"]['min'])
+  })
+  new_data.forEach(function(d){
+  ymax=Math.max(ymax,d.Deaths)
+  ymin=Math.min(ymin,d.Deaths)
+  })
+
+
+  // Show the X scale
+  var x = d3.scaleBand()
+    .range([ 0, width ])
+    //.domain(["Jan", "Feb", "Mar", "Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"])
+    .domain(list_months)
+    .paddingInner(1)
+    .paddingOuter(.5)
+
+  svg.append("g")
+    .style("font", "14px arial")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x))
+
+  // Show the Y scale
+  var y = d3.scaleLinear()
+    .domain([ymin*0.85,ymax*1.15])
+    .range([height, 0])
+
+  svg.append("g")
+    .style("font", "14px arial")
+    .call(d3.axisLeft(y).ticks(5))
+
+
+  // Show the main vertical line
+  svg
+    .selectAll("vertLines")
+    .data(sumstat)
+    .enter()
+    .append("line")
+      .attr("x1", function(d){return(x(d.key))})
+      .attr("x2", function(d){return(x(d.key))})
+      .attr("y1", function(d){return(y(d.value.min))})
+      .attr("y2", function(d){return(y(d.value.max))})
+      .attr("stroke", "black")
+      .style("width", 40)
+
+  // rectangle for the main box
+  var boxWidth = 50
+  svg
+    .selectAll("boxes")
+    .data(sumstat)
+    .enter()
+    .append("rect")
+        .attr("x", function(d){return(x(d.key)-boxWidth/2)})
+        .attr("y", function(d){return(y(d.value.q3))})
+        .attr("height", function(d){return(y(d.value.q1)-y(d.value.q3))})
+        .attr("width", boxWidth )
+        .attr("stroke", "black")
+        .style("fill", "#000000")
+
+  // Show the median
+  svg
+    .selectAll("medianLines")
+    .data(sumstat)
+    .enter()
+    .append("line")
+      .attr("x1", function(d){return(x(d.key)-boxWidth/2) })
+      .attr("x2", function(d){return(x(d.key)+boxWidth/2) })
+      .attr("y1", function(d){return(y(d.value.median))})
+      .attr("y2", function(d){return(y(d.value.median))})
+      .attr("stroke", "black")
+      .style("width", 80)
+
+// Add individual points with jitter
+var jitterWidth = 50
+svg
+  .selectAll("indPoints")
+  .data(old_data)
+  .enter()
+  .append("circle")
+    .attr("cx", function(d){return(x(d.Month) - (2015 - parseInt(d.Year))*6  )})
+    .attr("cy", function(d){return(y(d.Deaths))})
+    .attr("r", 4)
+    .style("fill", "white")
+    .attr("stroke", "black")
+
+svg
+  .selectAll("newPoints")
+  .data(new_data)
+  .enter()
+  .append("circle")
+    .attr("cx", function(d){return(x(d.Month))})
+    .attr("cy", function(d){return(y(d.Deaths))})
+    .attr("r", 5)
+    .style("fill", "red")
+    .attr("stroke", "black")
+
+svg.append("text")
+    .attr("class", "y label")
+    .style("font", "16px arial")
+    .attr("y", -70)
+    .attr("x", -230)
+    .attr("transform", "rotate(-90)")
+    .text("Number of Deaths");
+
+// Draw the table
+draw_table(old_data,new_data)
+
+})
+// End d3.csv
+}
+// End Plot function
+
+region="Italy"
+year="2020"
+
+
+plot(region,year)
+//console.log()
+
+
+d3.select('#region')
+  .on('change', function() {
+    new_region = d3.select(this).property('value');
+    operator = d3.select('#operator').property('value');
+    age = d3.select('#age').property('value');
+    year = d3.select('#year').property('value');
+    plot(new_region,year,operator,age);
+});
+
+d3.select('#year')
+  .on('change', function() {
+    region = d3.select('#region').property('value');
+    operator = d3.select('#operator').property('value');
+    age = d3.select('#age').property('value');
+    new_year = d3.select(this).property('value');
+    //console.log(region,new_year)
+    plot(region,new_year,operator,age);
+});
+
+d3.select('#operator')
+  .on('change', function() {
+    region = d3.select('#region').property('value');
+    operator = d3.select(this).property('value');
+    age = d3.select('#age').property('value');
+    new_year = d3.select("#year").property('value');
+    //console.log(region,new_year)
+    plot(region,new_year,operator,age);
+});
+
+d3.select('#age')
+  .on('change', function() {
+    region = d3.select('#region').property('value');
+    operator = d3.select('#operator').property('value');
+    age = d3.select(this).property('value');
+    new_year = d3.select('#year').property('value');
+    //console.log(region,new_year)
+    plot(region,new_year,operator,age);
+});
+
+</script>
+
+</body>
+</html>
