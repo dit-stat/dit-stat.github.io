@@ -284,6 +284,9 @@ function draw_table(data,new_data) {
           if (data[i] < 0.05 ) {
             $(row).find('td:eq("'+i+'")').css('font-weight', 'bold');
           }
+          if (data[i] > 0.05 ) {
+            $(row).find('td:eq("'+i+'")').css('color', 'blue');
+          }
         }
           //Highlight the row
           $(row).addClass("danger");
