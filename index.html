@@ -247,7 +247,9 @@ function draw_table(data,new_data) {
     }
 
     for (let i = 1; i < new_data[0].length; i++) {
-      //p=parseFloat(1-jStat.studentt.cdf((new_data[0][i]-v_mean['mean'][i])/v_mean['stdev'][i],8))
+      
+      pc=parseFloat(1-jStat.studentt.cdf((new_data[0][i]-v_mean['mean'][i])/v_mean['stdev'][i],8))
+      console.log(pc,new_data[0][i],v_mean['mean'][i],v_mean['stdev'][i])
       p=1-jStat.normal.cdf(new_data[0][i],v_mean['mean'][i],v_mean['stdev'][i])
       pvals.push(f(p))
     }
