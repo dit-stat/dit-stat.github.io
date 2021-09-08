@@ -98,13 +98,13 @@
 
 
 <b>Operator</b>: <select name="operator" id="operator" xonchange="get_operator(this)">
-        <option value="gt">&nbsp;&gt;&nbsp;</option>
+        <option value="ge">&nbsp;&ge;&nbsp;</option>
         <option value="le">&nbsp;&le;&nbsp;</option>
       </select>
 &nbsp;&nbsp;&nbsp;
 <b>Age</b>: <select name="age" id="age" xonchange="get_age(this)">
 
-  <option value=0>0</option>
+        <option value=0>all</option>
 	<option value=5>5</option>
 	<option value=10>10</option>
 	<option value=15>15</option>
@@ -126,7 +126,6 @@
 	<option value=95>95</option>
 	<option value=100>100</option>
 	<option value=105>105</option>
-  <option value=110>110</option>
 
       </select>
 
@@ -343,11 +342,11 @@ d3.csv("./20210531-istat.csv", function(data) {
       Year = parseInt(d.Year);
       Age = parseInt(d.Age);
       if ( Region != i_region ) {return;}
-      if (i_operator == "gt" && Age <= i_age ) {return;}
-      if (i_operator == "le" && Age > i_age ) {return;}
+      if (i_operator == "ge" && Age < i_age && i_age != 0) {return;}
+      if (i_operator == "le" && Age > i_age && i_age != 0) {return;}
       if  ( ! ( f_data.hasOwnProperty([Region,Month,Year] ) ) )
       {
-	 f_data [[Region,Month,Year]]=0
+	 f_data [[Region,Month,Year]] = 0
       }
       f_data [[Region,Month,Year]] = f_data [[Region,Month,Year]]  +parseInt(d.Deaths)
       //console.log([Region,Month,Year],lvs[[Region,Month,Year]])
@@ -370,7 +369,7 @@ d3.csv("./20210531-istat.csv", function(data) {
      var o = operator;
      var a = age;
      //if (o == "le" && a == 0) {a=5; age=5}
-     //if (o == "gt" && a == 110) {a=105; age =105}
+     //if (o == "ge" && a == 110) {a=105; age =105}
      var sel_data = select_data(data,region,year,operator,age)
 
      var y = year;
