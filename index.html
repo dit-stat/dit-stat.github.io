@@ -250,7 +250,7 @@ function draw_table(data,new_data) {
       
       pc=parseFloat(1-jStat.studentt.cdf((new_data[0][i]-v_mean['mean'][i])/v_mean['stdev'][i],8))
       p=1-jStat.normal.cdf(new_data[0][i],v_mean['mean'][i],v_mean['stdev'][i])
-      console.log(stat_data[i].length,p,pc,new_data[0][i],v_mean['mean'][i],v_mean['stdev'][i])
+      console.log(stat_data[i].size(),p,pc,new_data[0][i],v_mean['mean'][i],v_mean['stdev'][i])
       p=1-jStat.normal.cdf(new_data[0][i],v_mean['mean'][i],v_mean['stdev'][i])
       pvals.push(f(p))
     }
